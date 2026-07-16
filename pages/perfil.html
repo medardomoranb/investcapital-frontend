@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Perfil - InvestCapital Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+
+    <!-- ✅ HEADER -->
+    <div id="header"></div>
+
+    <div class="container mt-4 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-primary text-white rounded-top-4 p-4">
+                        <h4 class="mb-0"><i class="fas fa-user me-2"></i> Mi Perfil</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3" id="perfilDatos">
+                            <div class="col-md-6">
+                                <p><strong>ID:</strong> <span id="perfilId">-</span></p>
+                                <p><strong>Nombres:</strong> <span id="perfilNombres">-</span></p>
+                                <p><strong>Apellidos:</strong> <span id="perfilApellidos">-</span></p>
+                                <p><strong>Identificación:</strong> <span id="perfilIdentificacion">-</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Teléfono:</strong> <span id="perfilTelefono">-</span></p>
+                                <p><strong>Celular:</strong> <span id="perfilCelular">-</span></p>
+                                <p><strong>Correo:</strong> <span id="perfilCorreo">-</span></p>
+                                <p><strong>Dirección:</strong> <span id="perfilDireccion">-</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Estado Civil:</strong> <span id="perfilEstadoCivil">-</span></p>
+                                <p><strong>Estado:</strong> <span id="perfilEstado">-</span></p>
+                                <p><strong>Fecha Registro:</strong> <span id="perfilFechaRegistro">-</span></p>
+                            </div>
+                            <div class="col-12 text-end">
+                                <a href="perfil-editar.html" class="btn btn-primary">
+                                    <i class="fas fa-edit me-1"></i> Editar Perfil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ FOOTER -->
+    <div id="footer"></div>
+
+    <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        // ============================================
+        // 1. CARGAR HEADER Y FOOTER
+        // ============================================
+        fetch('../components/header.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) {
+                document.getElementById('header').innerHTML = data;
+                // Ejecutar funciones de app.js
+                if (typeof cargarMenuPorRol === 'function') {
+                    cargarMenuPorRol();
+                }
+                if (typeof configurarLogo === 'function') {
+                    configurarLogo();
+                }
+            })
+            .catch(function(error) {
+                console.error('❌ Error cargando header:', error);
+            });
+
+        fetch('../components/footer.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) {
+                document.getElementById('footer').innerHTML = data;
+            })
+            .catch(function(error) {
+                console.error('❌ Error cargando footer:', error);
+            });
+
+        // ============================================
+        // 2. CARGAR PERFIL
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 === PERFIL.HTML CARGADO ===');
+            
+            // Verificar sesión
+            var session = localStorage.getItem('session');
+            if (!session) {
+                console.warn('⚠️ No hay sesión, redirigiendo a login');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            var sessionData = JSON.parse(session);
+            console.log('📋 Sesión:', sessionData);
+            
+            // Si es administrador, redirigir a admin-panel
+            if (sessionData.rol === 'administrador') {
+                console.log('👤 Usuario administrador, redirigiendo a admin-panel');
+                window.location.href = 'admin-panel.html';
+                return;
+            }
+            
+            // Para inversionista: buscar cliente por correo
+            if (sessionData.rol === 'inversionista') {
+                console.log('👤 Usuario inversionista, cargando perfil...');
+                
+                fetch('http://127.0.0.1:8000/api/clientes/')
+                    .then(function(res) { return res.json(); })
+                    .then(function(clientes) {
+                        console.log('📋 Clientes recibidos:', clientes);
+                        // Buscar cliente por correo
+                        var cliente = clientes.find(function(c) {
+                            return c.correo === sessionData.correo;
+                        });
+                        
+                        if (!cliente) {
+                            console.error('❌ Cliente no encontrado para:', sessionData.correo);
+                            document.getElementById('perfilId').textContent = 'No encontrado';
+                            mostrarToast('Cliente no encontrado', 'error');
+                            return;
+                        }
+                        
+                        console.log('✅ Cliente encontrado:', cliente);
+                        
+                        // Mostrar datos
+                        document.getElementById('perfilId').textContent = cliente.id;
+                        document.getElementById('perfilNombres').textContent = cliente.nombres;
+                        document.getElementById('perfilApellidos').textContent = cliente.apellidos;
+                        document.getElementById('perfilIdentificacion').textContent = cliente.identificacion;
+                        document.getElementById('perfilTelefono').textContent = cliente.telefono || 'No registrado';
+                        document.getElementById('perfilCelular').textContent = cliente.celular;
+                        document.getElementById('perfilCorreo').textContent = cliente.correo;
+                        document.getElementById('perfilDireccion').textContent = cliente.direccion || 'No registrada';
+                        document.getElementById('perfilEstadoCivil').textContent = cliente.estadoCivil;
+                        document.getElementById('perfilEstado').innerHTML = '<span class="badge ' + (cliente.estado === 'activo' ? 'bg-success' : 'bg-danger') + '">' + cliente.estado + '</span>';
+                        document.getElementById('perfilFechaRegistro').textContent = new Date(cliente.fecha_registro).toLocaleString();
+                    })
+                    .catch(function(error) {
+                        console.error('❌ Error cargando clientes:', error);
+                        mostrarToast('Error cargando perfil', 'error');
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - InvestCapital Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body class="bg-light">
+
+    <div id="header"></div>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+
+                        <div class="text-center mb-4">
+                            <i class="fas fa-chart-line fs-1 text-primary"></i>
+                            <h3 class="fw-bold mt-2">InvestCapital Hub</h3>
+                            <p class="text-muted" id="loginSubtitle">Inicia sesión para continuar</p>
+                        </div>
+
+                        <!-- Credenciales informativas -->
+                        <div class="alert alert-info" id="credencialesAlert">
+                            <strong>🔐 Credenciales de prueba:</strong><br />
+                            <strong>Admin:</strong> admin@investcapital.com / admin1234<br />
+                            <strong>Inv:</strong> ana.martinez@email.com / password123
+                        </div>
+
+                        <!-- ============================================ -->
+                        <!-- FORMULARIO DE LOGIN (PASO 1) -->
+                        <!-- ============================================ -->
+                        <div id="loginFormContainer">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Correo electrónico</label>
+                                    <input type="email" id="correoLogin" class="form-control" placeholder="ejemplo@email.com" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Contraseña</label>
+                                    <input type="password" id="passwordLogin" class="form-control" placeholder="Ingrese su contraseña" required />
+                                </div>
+                                <button type="button" id="btnLogin" class="btn btn-primary w-100 py-2 fw-bold">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- ============================================ -->
+                        <!-- FORMULARIO DE 2FA (YA CONFIGURADO) -->
+                        <!-- ============================================ -->
+                        <div id="twofaFormContainer" style="display: none;">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-shield-alt me-2"></i> 
+                                <strong>🔐 Verificación de dos pasos</strong><br />
+                                <small>Ingresa el código de 6 dígitos de tu aplicación autenticadora</small>
+                            </div>
+                            <div class="text-center mb-3">
+                                <i class="fas fa-mobile-alt fs-1 text-primary"></i>
+                            </div>
+                            <form id="twofaForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Código de verificación</label>
+                                    <input type="text" id="codigo2fa" class="form-control text-center fs-1" placeholder="000000" maxlength="6" required autofocus />
+                                    <small class="text-muted">Ingresa el código de 6 dígitos de Google Authenticator</small>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" id="btnVerificar2fa" class="btn btn-success flex-grow-1 py-2 fw-bold">
+                                        <i class="fas fa-check me-2"></i> Verificar
+                                    </button>
+                                    <button type="button" id="btnMostrarQR" class="btn btn-outline-primary py-2 fw-bold">
+                                        <i class="fas fa-qrcode me-1"></i> QR
+                                    </button>
+                                </div>
+                            </form>
+                            <div class="text-center mt-3">
+                                <small class="text-muted">El código se actualiza cada 30 segundos</small>
+                            </div>
+                            <div class="text-center mt-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="volverLogin()">
+                                    <i class="fas fa-arrow-left me-1"></i> Volver
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ============================================ -->
+                        <!-- QR PARA MOSTRAR EN LA VERIFICACIÓN 2FA -->
+                        <!-- ============================================ -->
+                        <div id="qrMostrarContainer" style="display: none;" class="mt-3">
+                            <div class="alert alert-info">
+                                <i class="fas fa-qrcode me-2"></i> 
+                                <strong>📱 Escanea este QR con Google Authenticator</strong><br />
+                                <small>Si ya tienes la cuenta configurada, solo ingresa el código</small>
+                            </div>
+                            <div class="text-center">
+                                <img id="qrMostrarImage" src="" alt="QR Code" class="img-fluid" style="max-width: 220px; border: 1px solid #ddd; padding: 10px; border-radius: 10px; background: white;" />
+                            </div>
+                            <div class="text-center mt-2">
+                                <p class="text-muted small" id="qrMostrarSecret">Secret: </p>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cerrarQRMostrar()">
+                                    <i class="fas fa-times me-1"></i> Cerrar QR
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ============================================ -->
+                        <!-- QR PARA CONFIGURAR 2FA (PRIMERA VEZ) -->
+                        <!-- ============================================ -->
+                        <div id="qrConfigurarContainer" style="display: none;" class="mt-3">
+                            <div class="alert alert-info">
+                                <i class="fas fa-shield-alt me-2"></i> 
+                                <strong>🔐 Configurar autenticación de dos pasos</strong><br />
+                                <small>Escanea este QR con Google Authenticator o Microsoft Authenticator</small>
+                            </div>
+                            <div class="text-center">
+                                <img id="qrConfigurarImage" src="" alt="QR Code" class="img-fluid" style="max-width: 220px; border: 1px solid #ddd; padding: 10px; border-radius: 10px; background: white;" />
+                            </div>
+                            <div class="text-center mt-2">
+                                <p class="text-muted small" id="qrConfigurarSecret">Secret: </p>
+                                <div class="row g-2 justify-content-center">
+                                    <div class="col-7">
+                                        <input type="text" id="codigoConfirmar2fa" class="form-control text-center" placeholder="Código 6 dígitos" maxlength="6" />
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="button" id="btnConfirmar2fa" class="btn btn-success w-100">
+                                            <i class="fas fa-check"></i> Activar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="volverLogin()">
+                                        <i class="fas fa-arrow-left me-1"></i> Volver
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- UN SOLO BOTÓN PARA VOLVER (siempre visible) -->
+                        <div class="text-center mt-3">
+                            <a href="registro.html" class="text-decoration-none">¿No tienes cuenta? <strong>Regístrate aquí</strong></a>
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="../index.html" class="text-decoration-none text-muted small">
+                                <i class="fas fa-arrow-left me-1"></i> Volver al Inicio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        // ============================================
+        // 1. CARGAR HEADER Y FOOTER
+        // ============================================
+        fetch('../components/header.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) {
+                document.getElementById('header').innerHTML = data;
+                if (typeof cargarMenuPorRol === 'function') cargarMenuPorRol();
+                if (typeof configurarLogo === 'function') configurarLogo();
+            });
+
+        fetch('../components/footer.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) {
+                document.getElementById('footer').innerHTML = data;
+            });
+
+        // ============================================
+        // 2. VARIABLES GLOBALES
+        // ============================================
+        var usuarioId2fa = null;
+        var usuarioCorreo2fa = null;
+        var usuarioSecret2fa = null;
+        var qrUrl2fa = null;
+
+        // ============================================
+        // 3. FUNCIONES
+        // ============================================
+
+        function volverLogin() {
+            document.getElementById('twofaFormContainer').style.display = 'none';
+            document.getElementById('qrConfigurarContainer').style.display = 'none';
+            document.getElementById('qrMostrarContainer').style.display = 'none';
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('loginSubtitle').textContent = 'Inicia sesión para continuar';
+            document.getElementById('credencialesAlert').style.display = 'block';
+            document.getElementById('codigo2fa').value = '';
+            document.getElementById('codigoConfirmar2fa').value = '';
+            mostrarToast('👋 Vuelve al inicio de sesión', 'info');
+        }
+
+        function cerrarQRMostrar() {
+            document.getElementById('qrMostrarContainer').style.display = 'none';
+            document.getElementById('twofaFormContainer').style.display = 'block';
+            mostrarToast('📱 Ingresa el código de tu autenticador', 'info');
+            document.getElementById('codigo2fa').focus();
+        }
+
+        // ============================================
+        // 4. LOGIN - PRIMER PASO
+        // ============================================
+        document.getElementById('btnLogin').addEventListener('click', async function() {
+            var correo = document.getElementById('correoLogin').value.trim();
+            var password = document.getElementById('passwordLogin').value.trim();
+
+            if (!correo || !password) {
+                mostrarToast('Correo y contraseña son obligatorios', 'error');
+                return;
+            }
+
+            try {
+                mostrarToast('🔄 Verificando credenciales...', 'info');
+                
+                var response = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correo: correo, password: password })
+                });
+
+                var data = await response.json();
+                console.log('📡 Respuesta login:', data);
+
+                // ✅ CASO 1: El usuario NO tiene 2FA → Mostrar QR para configurar
+                if (data.requires_setup_2fa) {
+                    usuarioId2fa = data.usuario_id;
+                    usuarioCorreo2fa = correo;
+                    usuarioSecret2fa = data.secret;
+                    qrUrl2fa = data.otp_auth_url;
+                    
+                    document.getElementById('loginFormContainer').style.display = 'none';
+                    document.getElementById('qrConfigurarContainer').style.display = 'block';
+                    document.getElementById('loginSubtitle').textContent = '🔐 Configurar autenticación de dos pasos';
+                    document.getElementById('credencialesAlert').style.display = 'none';
+                    
+                    var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(data.otp_auth_url);
+                    document.getElementById('qrConfigurarImage').src = qrUrl;
+                    document.getElementById('qrConfigurarSecret').textContent = 'Secret: ' + data.secret;
+                    
+                    mostrarToast('📱 Escanea el QR con Google Authenticator', 'info');
+                    return;
+                }
+
+                // ✅ CASO 2: El usuario TIENE 2FA → Pedir código
+                if (data.requires_2fa) {
+                    usuarioId2fa = data.usuario_id;
+                    usuarioCorreo2fa = correo;
+                    
+                    // Guardar QR por si el usuario lo pide
+                    var qrResponse = await fetch('http://127.0.0.1:8000/api/auth/generar-qr/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ correo: correo })
+                    });
+                    var qrData = await qrResponse.json();
+                    if (qrData.success) {
+                        qrUrl2fa = qrData.otp_auth_url;
+                        usuarioSecret2fa = qrData.secret;
+                        document.getElementById('qrMostrarImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(qrData.otp_auth_url);
+                        document.getElementById('qrMostrarSecret').textContent = 'Secret: ' + qrData.secret;
+                    }
+                    
+                    document.getElementById('loginFormContainer').style.display = 'none';
+                    document.getElementById('twofaFormContainer').style.display = 'block';
+                    document.getElementById('loginSubtitle').textContent = '🔐 Verificación de dos pasos';
+                    document.getElementById('credencialesAlert').style.display = 'none';
+                    
+                    mostrarToast('📱 Ingresa el código de tu autenticador', 'info');
+                    document.getElementById('codigo2fa').focus();
+                    return;
+                }
+
+                // ✅ CASO 3: Login directo (sin 2FA)
+                if (data.success) {
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    localStorage.setItem('session', JSON.stringify(data.usuario));
+                    localStorage.setItem('sessionTime', String(Date.now()));
+
+                    mostrarToast('Bienvenido ' + data.usuario.nombre, 'success');
+
+                    setTimeout(function() {
+                        if (data.usuario.rol === 'administrador') {
+                            window.location.href = 'admin-panel.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1500);
+                } else {
+                    mostrarToast(data.error || 'Error en login', 'error');
+                }
+            } catch (error) {
+                console.error('Error en login:', error);
+                mostrarToast('Error de conexión con el servidor', 'error');
+            }
+        });
+
+        // ============================================
+        // 5. BOTÓN PARA MOSTRAR QR EN VERIFICACIÓN 2FA
+        // ============================================
+        document.getElementById('btnMostrarQR').addEventListener('click', function() {
+            document.getElementById('twofaFormContainer').style.display = 'none';
+            document.getElementById('qrMostrarContainer').style.display = 'block';
+            mostrarToast('📱 Escanea el QR con Google Authenticator', 'info');
+        });
+
+        // ============================================
+        // 6. CONFIRMAR 2FA (Activar después de escanear QR)
+        // ============================================
+        document.getElementById('btnConfirmar2fa').addEventListener('click', async function() {
+            var codigo = document.getElementById('codigoConfirmar2fa').value.trim();
+
+            if (!codigo || codigo.length !== 6) {
+                mostrarToast('Ingresa un código de 6 dígitos válido', 'error');
+                return;
+            }
+
+            try {
+                mostrarToast('🔄 Activando 2FA...', 'info');
+                
+                var response = await fetch('http://127.0.0.1:8000/api/auth/activar-2fa/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        usuario_id: usuarioId2fa,
+                        codigo: codigo
+                    })
+                });
+
+                var data = await response.json();
+
+                if (data.success) {
+                    mostrarToast('✅ 2FA activado correctamente', 'success');
+                    
+                    var loginResponse = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            correo: usuarioCorreo2fa,
+                            password: document.getElementById('passwordLogin').value
+                        })
+                    });
+                    
+                    var loginData = await loginResponse.json();
+                    
+                    if (loginData.success) {
+                        localStorage.setItem('access_token', loginData.access);
+                        localStorage.setItem('refresh_token', loginData.refresh);
+                        localStorage.setItem('session', JSON.stringify(loginData.usuario));
+                        localStorage.setItem('sessionTime', String(Date.now()));
+
+                        setTimeout(function() {
+                            if (loginData.usuario.rol === 'administrador') {
+                                window.location.href = 'admin-panel.html';
+                            } else {
+                                window.location.href = 'dashboard.html';
+                            }
+                        }, 1500);
+                    }
+                } else {
+                    mostrarToast(data.error || 'Error activando 2FA', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('Error de conexión', 'error');
+            }
+        });
+
+        // ============================================
+        // 7. VERIFICAR 2FA - SEGUNDO PASO
+        // ============================================
+        document.getElementById('btnVerificar2fa').addEventListener('click', async function() {
+            var codigo = document.getElementById('codigo2fa').value.trim();
+
+            if (!codigo || codigo.length !== 6) {
+                mostrarToast('Ingresa un código de 6 dígitos válido', 'error');
+                document.getElementById('codigo2fa').focus();
+                return;
+            }
+
+            try {
+                mostrarToast('🔄 Verificando código...', 'info');
+                
+                var response = await fetch('http://127.0.0.1:8000/api/auth/verificar-2fa/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        usuario_id: usuarioId2fa,
+                        codigo: codigo
+                    })
+                });
+
+                var data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    localStorage.setItem('session', JSON.stringify(data.usuario));
+                    localStorage.setItem('sessionTime', String(Date.now()));
+
+                    mostrarToast('✅ Verificación exitosa', 'success');
+
+                    setTimeout(function() {
+                        if (data.usuario.rol === 'administrador') {
+                            window.location.href = 'admin-panel.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1500);
+                } else {
+                    mostrarToast(data.error || '❌ Código incorrecto', 'error');
+                    document.getElementById('codigo2fa').value = '';
+                    document.getElementById('codigo2fa').focus();
+                }
+            } catch (error) {
+                console.error('Error verificando 2FA:', error);
+                mostrarToast('Error de conexión', 'error');
+            }
+        });
+
+        // ============================================
+        // 8. ENTER PARA ENVIAR
+        // ============================================
+        document.getElementById('codigo2fa').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnVerificar2fa').click();
+            }
+        });
+
+        document.getElementById('codigoConfirmar2fa').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnConfirmar2fa').click();
+            }
+        });
+
+        document.getElementById('passwordLogin').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnLogin').click();
+            }
+        });
+    </script>
+</body>
+</html>

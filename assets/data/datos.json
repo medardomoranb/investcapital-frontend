@@ -1,0 +1,122 @@
+ /*{
+  "clientes": [
+    {
+      "id": "CLI-001",
+      "nombres": "Ana",
+      "apellidos": "Martínez",
+      "identificacion": "1234567890",
+      "telefono": "022345678",
+      "celular": "0987654321",
+      "correo": "ana.martinez@email.com",
+      "direccion": "Calle Principal 123, Quito",
+      "estadoCivil": "soltero",
+      "estado": "activo",
+      "fecha_registro": "2026-06-01T08:30:00Z"
+    },
+    {
+      "id": "CLI-002",
+      "nombres": "Carlos",
+      "apellidos": "Gómez",
+      "identificacion": "2345678901",
+      "telefono": "022987654",
+      "celular": "0998765432",
+      "correo": "carlos.gomez@email.com",
+      "direccion": "Av. Amazonas 456, Quito",
+      "estadoCivil": "casado",
+      "estado": "activo",
+      "fecha_registro": "2026-06-02T10:15:00Z"
+    }
+  ],
+  "activos": [
+    {
+      "id": "ACT-001",
+      "codigo": "AAPL",
+      "nombre": "Apple Inc.",
+      "tipo": "acción",
+      "precio_actual": 175.50,
+      "variacion_diaria": 1.25,
+      "variacion_semanal": 3.50,
+      "variacion_mensual": 8.20,
+      "variacion_anual": 25.30,
+      "estado": "activo"
+    },
+    {
+      "id": "ACT-002",
+      "codigo": "BTC-USD",
+      "nombre": "Bitcoin",
+      "tipo": "criptomoneda",
+      "precio_actual": 68250.00,
+      "variacion_diaria": 3.20,
+      "variacion_semanal": 8.50,
+      "variacion_mensual": 15.30,
+      "variacion_anual": 85.40,
+      "estado": "activo"
+    }
+  ],
+  "portafolios": [
+    {
+      "id": "POR-001",
+      "cliente_id": "CLI-001",
+      "nombre": "Portafolio de Crecimiento",
+      "descripcion": "Inversiones a largo plazo en tecnología",
+      "estado": "activo",
+      "fecha_creacion": "2026-06-01T10:00:00Z",
+      "valor_total_invertido": 12500.00,
+      "valor_actual_total": 14250.00,
+      "rendimiento_porcentual": 14.00
+    },
+    {
+      "id": "POR-002",
+      "cliente_id": "CLI-001",
+      "nombre": "Cripto Portafolio",
+      "descripcion": "Diversificación en criptomonedas",
+      "estado": "activo",
+      "fecha_creacion": "2026-06-05T14:30:00Z",
+      "valor_total_invertido": 8500.00,
+      "valor_actual_total": 9200.00,
+      "rendimiento_porcentual": 8.24
+    }
+  ],
+  "transacciones": [
+    {
+      "id": "TRA-001",
+      "portafolio_id": "POR-001",
+      "activo_id": "ACT-001",
+      "tipo": "compra",
+      "cantidad": 10,
+      "precio_unitario": 168.50,
+      "monto_total": 1685.00,
+      "fecha": "2026-06-01T10:30:00Z",
+      "usuario_id": "CLI-001",
+      "estado": "completada"
+    }
+  ],
+  "reportes": [
+    {
+      "id": "REP-001",
+      "titulo": "Análisis de Apple Inc.",
+      "resumen": "Apple muestra un crecimiento sostenido en servicios...",
+      "contenido": "Apple Inc. (AAPL) continúa su tendencia alcista...",
+      "categoria": "Análisis Fundamental",
+      "autor": "admin@investcapital.com",
+      "fecha_publicacion": "2026-06-01T09:00:00Z",
+      "estado": "publicado",
+      "visualizaciones": 145,
+      "activos_relacionados": ["ACT-001"]
+    }
+  ],
+  "usuarios": [
+    {
+      "correo": "admin@investcapital.com",
+      "password": "admin1234",
+      "rol": "administrador",
+      "nombre": "Administrador"
+    },
+    {
+      "correo": "ana.martinez@email.com",
+      "password": "password123",
+      "rol": "inversionista",
+      "nombre": "Ana Martínez"
+    }
+  ]
+}*/

@@ -1,0 +1,43 @@
+<!-- P-24: Modal de Cambio de Estado -->
+<div class="modal fade" id="modalCambioEstado" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="modalCambioTitulo">Confirmar Cambio de Estado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalCambioCuerpo">
+                <p>¿Está seguro de cambiar el estado de <strong id="modalCambioEntidad">-</strong>?</p>
+                <div class="alert alert-info">
+                    <strong>Estado actual:</strong> <span id="modalCambioEstadoActual" class="badge bg-secondary">-</span><br />
+                    <strong>Nuevo estado:</strong> <span id="modalCambioNuevoEstado" class="badge bg-primary">-</span>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="modalCambioConfirmacion" />
+                    <label class="form-check-label" for="modalCambioConfirmacion">
+                        Confirmo que deseo realizar este cambio
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" id="modalCambioConfirmarBtn" disabled>
+                    <i class="fas fa-exchange-alt me-1"></i> Cambiar Estado
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Activar botón de confirmación cuando se marca el checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('modalCambioConfirmacion');
+        const btn = document.getElementById('modalCambioConfirmarBtn');
+        if (checkbox && btn) {
+            checkbox.addEventListener('change', function() {
+                btn.disabled = !this.checked;
+            });
+        }
+    });
+</script>

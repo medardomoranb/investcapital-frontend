@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mercado de Inversiones - InvestCapital Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div id="header"></div>
+
+    <div class="container-fluid px-4 py-4">
+        <h4 class="mb-4"><i class="fas fa-chart-line me-2 text-primary"></i> Mercado de Inversiones</h4>
+
+        <!-- ============================================ -->
+        <!-- 1. RESUMEN DEL MERCADO -->
+        <!-- ============================================ -->
+        <div class="row g-4 mb-4" id="resumenMercado">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-primary text-white">
+                    <div class="card-body">
+                        <h6 class="text-white-50">S&P 500</h6>
+                        <h4 class="fw-bold" id="sp500">-</h4>
+                        <small id="sp500Var">-</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-success text-white">
+                    <div class="card-body">
+                        <h6 class="text-white-50">Bitcoin (BTC)</h6>
+                        <h4 class="fw-bold" id="btcPrice">-</h4>
+                        <small id="btcVar">-</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-warning text-dark">
+                    <div class="card-body">
+                        <h6 class="text-dark-50">Ethereum (ETH)</h6>
+                        <h4 class="fw-bold" id="ethPrice">-</h4>
+                        <small id="ethVar">-</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="text-white-50">Volumen Total</h6>
+                        <h4 class="fw-bold">$2.4B</h4>
+                        <small><i class="fas fa-arrow-up me-1"></i> +12% hoy</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- 2. GRÁFICO DE EVOLUCIÓN CON SELECTOR -->
+        <!-- ============================================ -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2 text-primary"></i> Evolución del Activo</h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <select id="selectorActivo" class="form-select form-select-sm" style="width: auto;" onchange="cambiarActivoGrafico()">
+                                <option value="">Seleccionar activo...</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="cambiarPeriodoGrafico(7)">7D</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="cambiarPeriodoGrafico(30)">30D</button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="cambiarPeriodoGrafico(90)">90D</button>
+                            <button class="btn btn-sm btn-outline-success" onclick="actualizarMercado()">
+                                <i class="fas fa-sync me-1"></i> Actualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="graficoMercado"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- 3. ACTIVOS DISPONIBLES -->
+        <!-- ============================================ -->
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-boxes me-2 text-primary"></i> Activos Disponibles</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Símbolo</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Precio</th>
+                                        <th>Variación</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaActivosMercado">
+                                    <tr><td colspan="6" class="text-center text-muted py-3">Cargando activos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- 4. MI PORTAFOLIO -->
+        <!-- ============================================ -->
+        <div class="row g-4 mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-briefcase me-2 text-success"></i> Mi Portafolio</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Activo</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Compra</th>
+                                        <th>Precio Actual</th>
+                                        <th>Rendimiento</th>
+                                        <th>Rendimiento %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaMiPortafolio">
+                                    <tr><td colspan="6" class="text-center text-muted py-3">No tienes activos en tu portafolio.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- 5. BITÁCORA -->
+        <!-- ============================================ -->
+        <div class="row g-4 mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i> Bitácora de Acciones <span class="badge bg-primary ms-2" id="bitacoraContador">0</span></h5>
+                        <button class="btn btn-sm btn-outline-danger" onclick="limpiarBitacora()"><i class="fas fa-trash me-1"></i> Limpiar</button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="bitacoraContainer">
+                            <div class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin me-2"></i> Cargando acciones...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+    <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        // ============================================
+        // 1. CARGAR HEADER Y FOOTER
+        // ============================================
+        fetch('../components/header.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) {
+                document.getElementById('header').innerHTML = data;
+                if (typeof cargarMenuPorRol === 'function') cargarMenuPorRol();
+                if (typeof configurarLogo === 'function') configurarLogo();
+            });
+
+        fetch('../components/footer.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) {
+                document.getElementById('footer').innerHTML = data;
+            });
+
+        // ============================================
+        // 2. VARIABLES GLOBALES
+        // ============================================
+        var activosMercado = [];
+        var miPortafolio = [];
+        var graficoMercado = null;
+        var activoSeleccionado = null;
+        var datosHistoricos = [];
+        var diasActual = 30;
+
+        // ============================================
+        // 3. FUNCIONES
+        // ============================================
+
+        // 3.1 Cargar activos desde API
+        async function cargarActivosMercado() {
+            try {
+                var response = await fetch('http://127.0.0.1:8000/api/activos/');
+                var data = await response.json();
+                activosMercado = data;
+                console.log('✅ Activos cargados:', activosMercado.length);
+                renderizarActivosMercado();
+                cargarSelectActivos();
+                // Seleccionar primer activo por defecto
+                if (activosMercado.length > 0) {
+                    document.getElementById('selectorActivo').value = activosMercado[0].id;
+                    cargarHistorialActivo(activosMercado[0].id);
+                }
+                // Actualizar resumen
+                actualizarResumen();
+            } catch (error) {
+                console.error('Error cargando activos:', error);
+                mostrarToast('Error cargando activos', 'error');
+            }
+        }
+
+        // 3.2 Renderizar tabla de activos
+        function renderizarActivosMercado() {
+            var tbody = document.getElementById('tablaActivosMercado');
+            if (!tbody) return;
+            
+            if (activosMercado.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No hay activos disponibles.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = activosMercado.map(function(a) {
+                var badgeColor = 'bg-secondary';
+                if (a.tipo === 'acción') badgeColor = 'bg-primary';
+                else if (a.tipo === 'criptomoneda') badgeColor = 'bg-success';
+                else if (a.tipo === 'ETF') badgeColor = 'bg-warning text-dark';
+                
+                var variacion = a.variacion_diaria !== null ? a.variacion_diaria : 0;
+                var signo = variacion >= 0 ? '+' : '';
+                
+                return `
+                    <tr>
+                        <td><strong>${a.codigo}</strong></td>
+                        <td>${a.nombre}</td>
+                        <td><span class="badge ${badgeColor}">${a.tipo}</span></td>
+                        <td>${formatearMoneda(a.precio_actual)}</td>
+                        <td class="${variacion >= 0 ? 'text-success' : 'text-danger'}">${signo}${variacion}%</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" onclick="comprarActivoMercado('${a.id}')">
+                                <i class="fas fa-cart-plus me-1"></i> Comprar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 3.3 Cargar select de activos para el gráfico
+        function cargarSelectActivos() {
+            var select = document.getElementById('selectorActivo');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Seleccionar activo...</option>' +
+                activosMercado.map(function(a) {
+                    return `<option value="${a.id}">${a.codigo} - ${a.nombre}</option>`;
+                }).join('');
+        }
+
+        // 3.4 Cargar historial de un activo
+        async function cargarHistorialActivo(activoId) {
+            try {
+                var response = await fetch('http://127.0.0.1:8000/api/activos/' + activoId + '/historial/');
+                var data = await response.json();
+                datosHistoricos = data;
+                activoSeleccionado = activosMercado.find(function(a) { return a.id == activoId; });
+                console.log('✅ Historial cargado para:', data.nombre);
+                crearGraficoMercado(diasActual);
+            } catch (error) {
+                console.error('Error cargando historial:', error);
+                mostrarToast('Error cargando historial del activo', 'error');
+            }
+        }
+
+        // 3.5 Crear gráfico
+        function crearGraficoMercado(dias) {
+            var ctx = document.getElementById('graficoMercado').getContext('2d');
+            
+            if (graficoMercado) {
+                graficoMercado.destroy();
+            }
+            
+            if (!datosHistoricos || !datosHistoricos.precios || datosHistoricos.precios.length === 0) {
+                // Datos simulados si no hay históricos
+                var preciosSimulados = [];
+                var precio = activoSeleccionado ? activoSeleccionado.precio_actual : 100;
+                for (var i = dias; i > 0; i--) {
+                    var variacion = (Math.random() * 4) - 2;
+                    precio = precio * (1 + variacion / 100);
+                    preciosSimulados.push(Math.round(precio * 100) / 100);
+                }
+                
+                var fechasSimuladas = [];
+                var hoy = new Date();
+                for (var j = dias - 1; j >= 0; j--) {
+                    var fecha = new Date(hoy);
+                    fecha.setDate(fecha.getDate() - j);
+                    fechasSimuladas.push(fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+                }
+                
+                graficoMercado = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: fechasSimuladas,
+                        datasets: [{
+                            label: activoSeleccionado ? activoSeleccionado.codigo : 'Activo',
+                            data: preciosSimulados,
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 2,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '$' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+            
+            // Datos reales desde API
+            var fechas = datosHistoricos.fechas || [];
+            var precios = datosHistoricos.precios || [];
+            
+            // Limitar a los últimos 'dias' días
+            if (precios.length > dias) {
+                precios = precios.slice(precios.length - dias);
+                fechas = fechas.slice(fechas.length - dias);
+            }
+            
+            // Formatear fechas para mostrar más legible
+            var fechasFormateadas = fechas.map(function(f) {
+                var d = new Date(f);
+                return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+            });
+            
+            graficoMercado = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: fechasFormateadas,
+                    datasets: [{
+                        label: activoSeleccionado ? activoSeleccionado.codigo + ' - ' + activoSeleccionado.nombre : 'Activo',
+                        data: precios,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(0);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3.6 Cambiar activo en el gráfico
+        function cambiarActivoGrafico() {
+            var select = document.getElementById('selectorActivo');
+            var activoId = select.value;
+            if (activoId) {
+                cargarHistorialActivo(activoId);
+            }
+        }
+
+        // 3.7 Cambiar período del gráfico
+        function cambiarPeriodoGrafico(dias) {
+            diasActual = dias;
+            if (activoSeleccionado) {
+                cargarHistorialActivo(activoSeleccionado.id);
+            }
+        }
+
+        // 3.8 Actualizar resumen de mercado
+        function actualizarResumen() {
+            var btc = activosMercado.find(function(a) { return a.codigo === 'BTC-USD'; });
+            var eth = activosMercado.find(function(a) { return a.codigo === 'ETH-USD'; });
+            var spy = activosMercado.find(function(a) { return a.codigo === 'SPY'; });
+            
+            if (btc) {
+                document.getElementById('btcPrice').textContent = formatearMoneda(btc.precio_actual);
+                var btcVar = document.getElementById('btcVar');
+                var btcV = btc.variacion_diaria !== null ? btc.variacion_diaria : 0;
+                btcVar.textContent = (btcV >= 0 ? '+' : '') + btcV + '%';
+                btcVar.className = btcV >= 0 ? 'text-success' : 'text-danger';
+            }
+            if (eth) {
+                document.getElementById('ethPrice').textContent = formatearMoneda(eth.precio_actual);
+                var ethVar = document.getElementById('ethVar');
+                var ethV = eth.variacion_diaria !== null ? eth.variacion_diaria : 0;
+                ethVar.textContent = (ethV >= 0 ? '+' : '') + ethV + '%';
+                ethVar.className = ethV >= 0 ? 'text-success' : 'text-danger';
+            }
+            if (spy) {
+                document.getElementById('sp500').textContent = formatearMoneda(spy.precio_actual);
+                var spyVar = document.getElementById('sp500Var');
+                var spyV = spy.variacion_diaria !== null ? spy.variacion_diaria : 0;
+                spyVar.textContent = (spyV >= 0 ? '+' : '') + spyV + '%';
+                spyVar.className = spyV >= 0 ? 'text-success' : 'text-danger';
+            }
+        }
+
+        // 3.9 Actualizar mercado (simular nuevos precios)
+        async function actualizarMercado() {
+            try {
+                mostrarToast('🔄 Actualizando mercado...', 'info');
+                
+                var response = await fetch('http://127.0.0.1:8000/api/activos/actualizar-precios/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                var data = await response.json();
+                
+                if (data.success) {
+                    await cargarActivosMercado();
+                    registrarAccion('Actualización de Mercado', 'El usuario actualizó los precios del mercado', '');
+                    mostrarToast('✅ Mercado actualizado: ' + data.activos_actualizados + ' activos', 'success');
+                } else {
+                    mostrarToast('❌ ' + (data.error || 'Error desconocido'), 'error');
+                }
+            } catch (error) {
+                console.error('Error actualizando mercado:', error);
+                mostrarToast('❌ Error de conexión', 'error');
+            }
+        }
+
+        // 3.10 Comprar activo desde el mercado
+        function comprarActivoMercado(activoId) {
+            var activo = activosMercado.find(function(a) { return a.id == activoId; });
+            if (!activo) return;
+            
+            var cantidad = prompt('¿Cuántas unidades de ' + activo.codigo + ' deseas comprar? (Precio: ' + formatearMoneda(activo.precio_actual) + ')', '1');
+            if (cantidad === null) return;
+            cantidad = parseFloat(cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                mostrarToast('Cantidad inválida', 'error');
+                return;
+            }
+            
+            // Buscar si ya existe en el portafolio
+            var existente = miPortafolio.find(function(p) { return p.simbolo === activo.codigo; });
+            if (existente) {
+                var totalCantidad = existente.cantidad + cantidad;
+                var totalPrecio = (existente.cantidad * existente.precioCompra) + (cantidad * activo.precio_actual);
+                existente.cantidad = totalCantidad;
+                existente.precioCompra = totalPrecio / totalCantidad;
+            } else {
+                miPortafolio.push({
+                    simbolo: activo.codigo,
+                    nombre: activo.nombre,
+                    cantidad: cantidad,
+                    precioCompra: activo.precio_actual
+                });
+            }
+            
+            renderizarMiPortafolio();
+            registrarAccion('Compra de Activo', 'El usuario compró ' + cantidad + ' de ' + activo.codigo, 'Precio: ' + formatearMoneda(activo.precio_actual));
+            mostrarToast('✅ Compra de ' + cantidad + ' ' + activo.codigo + ' realizada', 'success');
+        }
+
+        // 3.11 Renderizar portafolio
+        function renderizarMiPortafolio() {
+            var tbody = document.getElementById('tablaMiPortafolio');
+            if (!tbody) return;
+            
+            if (miPortafolio.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No tienes activos en tu portafolio.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = miPortafolio.map(function(p) {
+                var activo = activosMercado.find(function(a) { return a.codigo === p.simbolo; });
+                var precioActual = activo ? activo.precio_actual : p.precioCompra;
+                var rendimiento = (precioActual - p.precioCompra) * p.cantidad;
+                var rendimientoPct = ((precioActual / p.precioCompra) - 1) * 100;
+                
+                return `
+                    <tr>
+                        <td><strong>${p.simbolo}</strong> - ${p.nombre || ''}</td>
+                        <td>${p.cantidad}</td>
+                        <td>${formatearMoneda(p.precioCompra)}</td>
+                        <td>${formatearMoneda(precioActual)}</td>
+                        <td class="${rendimiento >= 0 ? 'text-success' : 'text-danger'}">${rendimiento >= 0 ? '+' : ''}${formatearMoneda(rendimiento)}</td>
+                        <td class="${rendimientoPct >= 0 ? 'text-success' : 'text-danger'}">${rendimientoPct >= 0 ? '+' : ''}${rendimientoPct.toFixed(2)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // 4. INICIALIZAR
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 MERCADO INICIALIZADO');
+            cargarActivosMercado();
+            cargarBitacora();
+            renderizarBitacora();
+        });
+    </script>
+</body>
+</html>

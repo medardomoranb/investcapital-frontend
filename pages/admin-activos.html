@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Activos - InvestCapital Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+
+    <div id="header"></div>
+
+    <div class="container-fluid px-4 py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+             <h4>
+        <a href="admin-panel.html" class="text-decoration-none text-dark">
+            <i class="fas fa-chart-line me-2 text-primary"></i> InvestCapital Hub
+        </a>
+        <span class="text-muted fs-6 ms-3">/ Gestión de Activos</span>
+    </h4>
+            <div>
+                <button class="btn btn-success me-2" onclick="window.location.href='admin-activo-crear.html'">
+                    <i class="fas fa-plus me-1"></i> Nuevo Activo
+                </button>
+                <button class="btn btn-warning" onclick="actualizarPreciosMasivos()">
+                    <i class="fas fa-sync me-1"></i> Actualizar Precios
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Precio</th>
+                                <th>Variación</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaActivosAdmin">
+                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando activos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        // Cargar componentes
+        fetch('../components/header.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('header').innerHTML = data;
+            // 🔥 IMPORTANTE: Ejecutar cargarMenuPorRol() DESPUÉS de cargar el header
+            cargarMenuPorRol();
+        });
+        fetch('../components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('footer').innerHTML = data);
+
+        // El resto está en activos.js
+            // Forzar redirección del logo
+    document.addEventListener('DOMContentLoaded', function() {
+        var logoLink = document.getElementById('logoAdminLink');
+        if (logoLink) {
+            logoLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'admin-panel.html';
+            });
+        }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+    cargarActivosAdmin();
+});
+    </script>
+</body>
+</html>

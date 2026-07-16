@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de Portafolio - InvestCapital Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+
+    <div id="header"></div>
+
+    <div class="container mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 id="portafolioTitulo"><i class="fas fa-folder-open me-2 text-primary"></i> Detalle de Portafolio</h4>
+            <div>
+                <a href="portafolios.html" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-arrow-left me-1"></i> Volver
+                </a>
+                <button class="btn btn-outline-primary" onclick="editarPortafolio()">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </button>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="card shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <div class="row g-4" id="resumenPortafolio">
+                    <div class="col-md-3">
+                        <p class="text-muted mb-0">Nombre</p>
+                        <p class="fw-bold" id="detalleNombrePortafolio">-</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted mb-0">Descripción</p>
+                        <p id="detalleDescripcionPortafolio">-</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted mb-0">Valor Total</p>
+                        <p class="fw-bold" id="detalleValorTotal">-</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted mb-0">Rendimiento</p>
+                        <p class="fw-bold" id="detalleRendimiento">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activos en el portafolio -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-list me-2 text-primary"></i> Activos en este Portafolio</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaActivosPortafolio">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Activo</th>
+                                <th>Cantidad</th>
+                                <th>Precio Compra</th>
+                                <th>Precio Actual</th>
+                                <th>Rendimiento</th>
+                                <th>Rendimiento %</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoActivosPortafolio">
+                            <tr><td colspan="7" class="text-center text-muted py-3">No hay activos en este portafolio</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transacciones -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i> Historial de Transacciones</h5>
+                <div class="d-flex gap-2">
+                    <select id="filtroTipoTransaccion" class="form-select form-select-sm" style="width: auto;" onchange="filtrarTransacciones()">
+                        <option value="">Todos</option>
+                        <option value="compra">Compras</option>
+                        <option value="venta">Ventas</option>
+                    </select>
+                    <input type="date" id="filtroFechaDesde" class="form-control form-control-sm" style="width: auto;" onchange="filtrarTransacciones()" />
+                    <input type="date" id="filtroFechaHasta" class="form-control form-control-sm" style="width: auto;" onchange="filtrarTransacciones()" />
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Activo</th>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Monto Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTransacciones">
+                            <tr><td colspan="7" class="text-center text-muted py-3">No hay transacciones registradas</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginacionTransacciones"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+    <script>
+       fetch('../components/header.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('header').innerHTML = data;
+            // 🔥 IMPORTANTE: Ejecutar cargarMenuPorRol() DESPUÉS de cargar el header
+            cargarMenuPorRol();
+        });
+        fetch('../components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('footer').innerHTML = data);
+
+            document.addEventListener('DOMContentLoaded', function() {
+    cargarDetallePortafolio();
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!-- V-14: Filtros de Transacciones -->
+<div class="row g-2 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">Tipo</label>
+        <select id="filtroTipoTransaccion" class="form-select form-select-sm" onchange="filtrarTransacciones()">
+            <option value="">Todas</option>
+            <option value="compra">Compras</option>
+            <option value="venta">Ventas</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">Fecha Desde</label>
+        <input type="date" id="filtroFechaDesde" class="form-control form-control-sm" onchange="filtrarTransacciones()" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold small">Fecha Hasta</label>
+        <input type="date" id="filtroFechaHasta" class="form-control form-control-sm" onchange="filtrarTransacciones()" />
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-sm btn-outline-secondary w-100" onclick="limpiarFiltrosTransacciones()">
+            <i class="fas fa-undo me-1"></i> Limpiar
+        </button>
+    </div>
+</div>

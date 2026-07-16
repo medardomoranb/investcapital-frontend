@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Reporte - InvestCapital Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+
+    <div id="header"></div>
+
+    <div class="container mt-4 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-success text-white rounded-top-4 p-4">
+                        <h4 class="mb-0"><i class="fas fa-file-circle-plus me-2"></i> Crear Nuevo Reporte</h4>
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="crearReporteForm" onsubmit="return handleCrearReporte(event)">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Título <span class="text-danger">*</span></label>
+                                <input type="text" id="tituloReporte" class="form-control" placeholder="Título del reporte" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Resumen <span class="text-danger">*</span></label>
+                                <textarea id="resumenReporte" class="form-control" rows="2" placeholder="Breve resumen del reporte" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Contenido <span class="text-danger">*</span></label>
+                                <textarea id="contenidoReporte" class="form-control" rows="5" placeholder="Contenido completo del reporte" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Categoría <span class="text-danger">*</span></label>
+                                <select id="categoriaReporte" class="form-select" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Análisis Fundamental">Análisis Fundamental</option>
+                                    <option value="Análisis Técnico">Análisis Técnico</option>
+                                    <option value="Análisis Sectorial">Análisis Sectorial</option>
+                                    <option value="Educativo">Educativo</option>
+                                    <option value="General">General</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Activos Relacionados</label>
+                                <select id="activosRelacionados" class="form-select" multiple>
+                                    <!-- Se llena desde JavaScript -->
+                                </select>
+                                <small class="text-muted">Mantenga presionado Ctrl para seleccionar múltiples</small>
+                            </div>
+                            <div class="d-flex gap-3 mt-4">
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i class="fas fa-save me-2"></i> Publicar Reporte
+                                </button>
+                                <a href="admin-reportes.html" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="fas fa-times me-2"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+    <script>
+       fetch('../components/header.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('header').innerHTML = data;
+            // 🔥 IMPORTANTE: Ejecutar cargarMenuPorRol() DESPUÉS de cargar el header
+            cargarMenuPorRol();
+        });
+        fetch('../components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('footer').innerHTML = data);
+
+        // Cargar activos para el select
+        fetch('../assets/data/datos.json')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('activosRelacionados');
+                if (select && data.activos) {
+                    select.innerHTML = data.activos.map(a => 
+                        `<option value="${a.id}">${a.codigo} - ${a.nombre}</option>`
+                    ).join('');
+                }
+            });
+
+        function handleCrearReporte(event) {
+            event.preventDefault();
+            const titulo = document.getElementById('tituloReporte').value.trim();
+            const resumen = document.getElementById('resumenReporte').value.trim();
+            const contenido = document.getElementById('contenidoReporte').value.trim();
+            const categoria = document.getElementById('categoriaReporte').value;
+
+            if (!titulo || !resumen || !contenido || !categoria) {
+                mostrarToast('Complete todos los campos obligatorios', 'error');
+                return false;
+            }
+
+            mostrarToast('Reporte publicado exitosamente', 'success');
+            setTimeout(() => window.location.href = 'admin-reportes.html', 1500);
+            return false;
+        }
+    </script>
+</body>
+</html>
