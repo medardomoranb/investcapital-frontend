@@ -1,0 +1,1 @@
+web: gunicorn investcapital_backend.wsgi
