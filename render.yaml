@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: investcapital-api
+    runtime: python
+    plan: free
+    pythonVersion: 3.11.9
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn investcapital_backend.wsgi
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: "False"
