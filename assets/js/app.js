@@ -7,7 +7,7 @@
 // 1. CONFIGURACIÓN DE LA API
 // ============================================
 
-const API_URL = 'http://127.0.0.1:8000/api/';
+const API_URL = 'https://investcapital-frontend.onrender.com/api/';
 
 
 // ============================================
