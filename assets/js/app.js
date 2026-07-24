@@ -7,7 +7,8 @@
 // 1. CONFIGURACIÓN DE LA API
 // ============================================
 
-const API_URL = 'https://tu-backend.onrender.com/api/';
+const API_URL = 'http://127.0.0.1:8000/api/';
+
 
 // ============================================
 // 2. UTILIDADES
